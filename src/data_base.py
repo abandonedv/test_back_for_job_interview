@@ -9,7 +9,7 @@ class DataBase:
 
     def get_all(self):
         try:
-            self.__cur.execute("SELECT * FROM test")
+            self.__cur.execute("SELECT * FROM test ORDER BY numb")
             res = self.__cur.fetchall()
             if res:
                 return res
@@ -32,7 +32,7 @@ class DataBase:
             my_time = get_new_date(row[3])
             rub_cost = get_price_in_rub(row)
             self.__cur.execute(
-                f"INSERT INTO test VALUES ('{row[0]}', '{row[1]}', '{row[2]}', '{rub_cost}', '{my_time}')")
+                f"""INSERT INTO test VALUES ('{row[0]}', '{row[1]}', '{row[2]}', '{rub_cost}', '{my_time}')""")
             self.__db.commit()
 
         except Exception as e:
@@ -76,14 +76,32 @@ class DataBase:
 
     def update_row(self, row_from_sheet):
         try:
-            self.__cur.execute(
-                f"""UPDATE test 
-                SET 
-                numb = '{int(row_from_sheet[0])}',
-                usd_cost = '{int(row_from_sheet[2])}',
-                rub_cost = '{get_price_in_rub(row_from_sheet)}',
-                delivery_time = '{row_from_sheet[3]}'
-                WHERE order_numb = '{int(row_from_sheet[1])}'""")
+            self.__cur.execute(f"""
+                                    UPDATE test 
+                                    SET 
+                                    numb = '{int(row_from_sheet[0])}',
+                                    usd_cost = '{int(row_from_sheet[2])}',
+                                    rub_cost = '{get_price_in_rub(row_from_sheet)}',
+                                    delivery_time = '{row_from_sheet[3]}'
+                                    WHERE order_numb = '{int(row_from_sheet[1])}'
+                                """)
             self.__db.commit()
         except Exception as e:
             print(e)
+
+    def get_out_of_date(self):
+        try:
+            now_date = get_now_date()
+            self.__cur.execute(f"""
+                                    SELECT * 
+                                    FROM test
+                                    WHERE delivery_time < '{now_date}'
+                                    ORDER BY numb
+                                """)
+            res = self.__cur.fetchall()
+            if res:
+                return res
+        except Exception as e:
+            print(e)
+
+

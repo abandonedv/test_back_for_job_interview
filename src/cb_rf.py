@@ -5,7 +5,7 @@ from my_functions import *
 
 def get_rate(row_time):
     if get_date_for_comp(row_time) > get_date_for_comp(get_now_date()):
-        row_time = get_now_date()
+        row_time = get_now_slash_date()
     response = requests.get(f"https://www.cbr.ru/scripts/XML_daily.asp?date_req={row_time}", stream=True)
 
     response.raw.decode_content = True

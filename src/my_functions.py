@@ -17,8 +17,12 @@ def get_date_for_comp(str_date):
 
 
 def get_now_date():
-    now_data = str(datetime.datetime.now()).split()[0]
-    return "/".join(now_data.split("-")[::-1])
+    return str(datetime.datetime.now()).split()[0]
+
+
+def get_now_slash_date():
+    now_date = get_now_date()
+    return "/".join(now_date.split("-")[::-1])
 
 
 def get_date_for_req(str_date):
@@ -33,3 +37,15 @@ def get_str_date(all_date):
 
 def get_list_of_ord_numbs(list_of_values):
     return list(map(lambda x: int(x[1]), list_of_values))
+
+
+def prepare_message(res):
+    message = "Cрок поставки прошел:\n\n"
+    for row in res:
+        message = message + f"№: {row[0]}\n" \
+                f"Order №: {row[1]}\n" \
+                f"USD cost: {row[2]}\n" \
+                f"RUB cost: {row[3]}\n" \
+                f"delivery time: {row[4]}\n\n"
+
+    return message

@@ -6,7 +6,11 @@ import to_json
 import get_sheet_data
 import psycopg2
 import data_base
+import requests
+from my_functions import *
 
+TOKEN = "5141013666:AAFDkri_oHLhSxP5fbu0qFEAgm_BDwZ2Hn4"
+TELEGRAM_SEND_MESSAGE_URL = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
 MY_HEADER = {"Access-Control-Allow-Origin": "*"}
 app = Flask(__name__)
 
@@ -36,7 +40,7 @@ def get_db():
 
 
 @app.teardown_appcontext
-def close_db(exception=None):
+def close_db(exeption=None):
     """Закрываем соединениее с БД, если оно было установлено"""
     if hasattr(g, "link_db"):
         g.link_db.close()
@@ -71,8 +75,20 @@ def background_sync():
         print("synced")
 
 
+def telegram_bot():
+    with app.app_context():
+        before_request()
+        res = dbase.get_out_of_date()
+        message = prepare_message(res)
+        my_dict = {"text": f"{message}", "chat_id": 427305163}
+        requests.post(TELEGRAM_SEND_MESSAGE_URL, json=my_dict)
+        close_db()
+        print("sent")
+
+
 if __name__ == "__main__":
     scheduler = BackgroundScheduler()
-    job = scheduler.add_job(background_sync, 'interval', minutes=10)
+    job1 = scheduler.add_job(background_sync, 'interval', minutes=10)
+    job2 = scheduler.add_job(telegram_bot, 'interval', minutes=3600 * 12)
     scheduler.start()
     app.run(debug=True)
