@@ -1,4 +1,5 @@
 from my_functions import *
+from cb_rf import get_price_in_rub
 
 
 class DataBase:
@@ -28,7 +29,7 @@ class DataBase:
 
     def insert_one(self, row):
         try:
-            my_time = get_new_date(row)
+            my_time = get_new_date(row[3])
             rub_cost = get_price_in_rub(row)
             self.__cur.execute(
                 f"INSERT INTO test VALUES ('{row[0]}', '{row[1]}', '{row[2]}', '{rub_cost}', '{my_time}')")
@@ -65,22 +66,24 @@ class DataBase:
                 self.delete_one(row)
 
     def update_db(self, list_of_values):
-        for row in list_of_values:
-            res = self.get_one(row)
-            if res == None:
-                self.insert_one(row)
+        for row_from_sheet in list_of_values:
+            row_from_db = self.get_one(row_from_sheet)
+            if row_from_db == None:
+                self.insert_one(row_from_sheet)
             else:
-                new_time = get_new_date(row)
-                old_time = str(res[4])
-                if not check_del_date(new_time, old_time):
-                    self.update_delivery_date(row, new_time)
+                if not check_diff(row_from_sheet, row_from_db):
+                    self.update_row(row_from_sheet)
 
-    def update_delivery_date(self, row, new_time):
+    def update_row(self, row_from_sheet):
         try:
             self.__cur.execute(
                 f"""UPDATE test 
-                SET delivery_time = '{new_time}' 
-                WHERE '{row[1]}' = order_numb""")
+                SET 
+                numb = '{int(row_from_sheet[0])}',
+                usd_cost = '{int(row_from_sheet[2])}',
+                rub_cost = '{get_price_in_rub(row_from_sheet)}',
+                delivery_time = '{row_from_sheet[3]}'
+                WHERE order_numb = '{int(row_from_sheet[1])}'""")
             self.__db.commit()
         except Exception as e:
             print(e)

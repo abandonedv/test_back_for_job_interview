@@ -1,7 +1,7 @@
 import json
 
 from flask import Flask, make_response, g
-
+from apscheduler.schedulers.background import BackgroundScheduler
 import to_json
 import get_sheet_data
 import psycopg2
@@ -36,7 +36,7 @@ def get_db():
 
 
 @app.teardown_appcontext
-def close_db(exeption):
+def close_db(exception=None):
     """Закрываем соединениее с БД, если оно было установлено"""
     if hasattr(g, "link_db"):
         g.link_db.close()
@@ -62,5 +62,17 @@ def chart():
     return response
 
 
+def background_sync():
+    with app.app_context():
+        before_request()
+        table_data = get_sheet_data.get_sheet_data()
+        dbase.sync_data(table_data)
+        close_db()
+        print("synced")
+
+
 if __name__ == "__main__":
+    scheduler = BackgroundScheduler()
+    job = scheduler.add_job(background_sync, 'interval', minutes=10)
+    scheduler.start()
     app.run(debug=True)

@@ -1,19 +1,28 @@
-import time
-
-from cb_rf import *
 import datetime
 
 
-def check_del_date(new_time, old_time):
-    return new_time == old_time
+def check_diff(row_from_sheet, row_from_db):
+    bool = int(row_from_sheet[0]) == row_from_db[0] and \
+           int(row_from_sheet[2]) == row_from_db[2] and \
+           get_new_date(row_from_sheet[3]) == str(row_from_db[4])
+    return bool
 
 
-def get_new_date(row):
-    return "-".join(row[3].split(".")[::-1])
+def get_new_date(str_date):
+    return "-".join(str_date.split(".")[::-1])
 
 
-def get_date_for_req(row):
-    return row[3].replace(".", "/")
+def get_date_for_comp(str_date):
+    return "-".join(str_date.split("/")[::-1])
+
+
+def get_now_date():
+    now_data = str(datetime.datetime.now()).split()[0]
+    return "/".join(now_data.split("-")[::-1])
+
+
+def get_date_for_req(str_date):
+    return str_date.replace(".", "/")
 
 
 def get_str_date(all_date):
@@ -22,24 +31,5 @@ def get_str_date(all_date):
     return all_date
 
 
-def get_rate_float(date):
-    str_rate = get_rate(date)
-    float_rate = float(str_rate.replace(",", "."))
-    return float_rate
-
-
-def get_price_in_rub(row):
-    date = get_date_for_req(row)
-    rate = get_rate_float(date)
-    price = float(row[2])
-    return price * rate
-
-
 def get_list_of_ord_numbs(list_of_values):
     return list(map(lambda x: int(x[1]), list_of_values))
-
-# def get_seconds(date):
-#     date_list = list(map(int, date.split("-")))
-#     res_date = datetime.datetime(*date_list)
-#     sec = res_date.timestamp()
-#     return sec * 1000
