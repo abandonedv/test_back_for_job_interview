@@ -7,6 +7,24 @@ class DataBase:
         self.__db = db
         self.__cur = db.cursor()
 
+    def create_if_not_exist(self):
+        try:
+            self.__cur.execute(
+                f"""CREATE TABLE IF NOT EXISTS public.test
+                    (
+                        numb integer,
+                        order_numb integer NOT NULL,
+                        usd_cost integer,
+                        rub_cost real,
+                        delivery_time date,
+                        CONSTRAINT test_pkey PRIMARY KEY (order_numb)
+                    )
+                """)
+            self.__db.commit()
+
+        except Exception as e:
+            print(e)
+
     def get_all(self):
         try:
             self.__cur.execute("SELECT * FROM test ORDER BY numb")
@@ -47,6 +65,7 @@ class DataBase:
             print(e)
 
     def sync_data(self, table_data):
+        self.create_if_not_exist()
         list_of_values = table_data.get('values')[1:]
         all_db_data = self.get_all()
         if all_db_data == []:
