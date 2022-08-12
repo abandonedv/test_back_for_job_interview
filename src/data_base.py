@@ -68,15 +68,17 @@ class DataBase:
         self.create_if_not_exist()
         list_of_values = table_data.get('values')[1:]
         all_db_data = self.get_all()
-        if all_db_data == []:
+        if all_db_data is None:
             self.fill_db(list_of_values)
         else:
             self.update_db(list_of_values)
-        self.delete_trash(all_db_data, list_of_values)
+            self.delete_trash(all_db_data, list_of_values)
 
     def fill_db(self, list_of_values):
-        for row in list_of_values:
-            self.insert_one(row)
+        for row_from_sheet in list_of_values:
+            row_from_db = self.get_one(row_from_sheet)
+            if row_from_db == None:
+                self.insert_one(row_from_sheet)
 
     def delete_trash(self, all_db_data, list_of_values):
         list_of_values = get_list_of_ord_numbs(list_of_values)
@@ -122,5 +124,3 @@ class DataBase:
                 return res
         except Exception as e:
             print(e)
-
-
