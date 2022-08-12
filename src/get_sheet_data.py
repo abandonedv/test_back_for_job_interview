@@ -3,7 +3,7 @@ import apiclient.discovery
 from oauth2client.service_account import ServiceAccountCredentials
 from pprint import pprint
 
-CREDENTIALS_FILE = 'creds.json'
+CREDENTIALS_FILE = 'src/creds.json'
 spreadsheet_id = '1yWcBQDo2VxVFFWWaDPAF_fLM7mfu3gDWaifqwsVhVsU'
 
 
