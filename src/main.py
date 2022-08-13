@@ -19,17 +19,22 @@ dbase = None
 
 @app.before_request
 def before_request():
+    """Получаем объект базы данных для дальнейшего использования"""
     global dbase
     db = get_db()
     dbase = data_base.DataBase(db)
 
 
 def connect_db():
-    conn = psycopg2.connect(user="postgres",
-                            password="vadim",
-                            host="localhost",
-                            database="test")
-    return conn
+    try:
+        conn = psycopg2.connect(user="postgres",
+                                password="vadim",
+                                host="localhost",
+                                database="test")
+        return conn
+    except Exception as e:
+        print("Ошибка соединения с базой данных")
+        exit()
 
 
 def get_db():
@@ -48,6 +53,8 @@ def close_db(exeption=None):
 
 @app.route('/', methods=['GET'])
 def home():
+    """Функция-обработчик отвечающая за синхронизацию бд с google sheet и
+    подгрузку данных в таблицу в виде json объекта"""
     table_data = get_sheet_data.get_sheet_data()
     dbase.sync_data(table_data)
     res_json = to_json.to_json_home(dbase)
@@ -59,6 +66,7 @@ def home():
 
 @app.route('/chart', methods=['GET'])
 def chart():
+    """Функция-обработчик отвечающая за подгрузку данных в график в виде json объекта"""
     res_json = to_json.to_json_chart(dbase)
     response = make_response((json.dumps(res_json),
                               200,
@@ -67,6 +75,7 @@ def chart():
 
 
 def background_sync():
+    """Функция-обработчик отвечающая за автоматическую синхронизацию бд с google sheet"""
     with app.app_context():
         before_request()
         table_data = get_sheet_data.get_sheet_data()
@@ -76,6 +85,8 @@ def background_sync():
 
 
 def telegram_bot():
+    """Функция-обработчик отвечающая за автоматическую проверку соблюдения «срока поставки» из таблицы.
+        В случае, если срок прошел, скрипт отправляет уведомление в Telegram"""
     with app.app_context():
         before_request()
         res = dbase.get_out_of_date()

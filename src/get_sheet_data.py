@@ -8,6 +8,7 @@ spreadsheet_id = '1yWcBQDo2VxVFFWWaDPAF_fLM7mfu3gDWaifqwsVhVsU'
 
 
 def get_sheet_data():
+    """Функция совершающая get-запрос google sheet API для получения данных таблицы"""
     credantials = ServiceAccountCredentials.from_json_keyfile_name \
             (
             CREDENTIALS_FILE,
