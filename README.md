@@ -1,7 +1,10 @@
 Тестовое задание от Ильиных Вадима
 Ссылка на резюме: https://hh.ru/?hhtmFrom=resume_view_history&customDomain=1
+
 Backend: https://github.com/abandonedv/test_back_for_job_interview 
+
 Frontend: https://github.com/abandonedv/test_front_for_job_interview 
+
 Ссылка на Google Sheets таблицу: https://docs.google.com/spreadsheets/d/1yWcBQDo2VxVFFWWaDPAF_fLM7mfu3gDWaifqwsVhVsU/edit#gid=0 
 Выполнил все 5 пунктов тестового задания
 
