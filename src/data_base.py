@@ -4,6 +4,7 @@ from cb_rf import get_price_in_rub
 
 class DataBase:
     def __init__(self, db):
+        """Класс имеющий в качестве атрибута курсор для удобного написания запросов"""
         self.__db = db
         self.__cur = db.cursor()
 
